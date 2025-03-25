@@ -1,4 +1,7 @@
+import logging.config
+import json
 import os
+import time
 from contextlib import asynccontextmanager
 
 import motor.motor_asyncio
@@ -16,6 +19,13 @@ from routes.url_router import short_urls_router
 
 load_dotenv()
 
+# Setup logging
+with open("logging_conf.json", "r") as f:
+    logging_conf = json.load(f)
+
+logging.config.dictConfig(logging_conf)
+fastapi_logger = logging.getLogger("fastapi")
+
 # Jinja2 templates setup
 templates = Jinja2Templates(directory="templates")
 
@@ -24,16 +34,20 @@ templates = Jinja2Templates(directory="templates")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Setup connection to MongoDB
-    print("Connecting to MongoDB")
+    fastapi_logger.info("Connecting to MongoDB")
+
     client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGO_URI"))
     await init_beanie(database=client.aguest_me, document_models=[ShortURLs])
 
-    print("Connected to MongoDB")
+    fastapi_logger.info("Connected to MongoDB")
+
+    # Register other routers
     app.include_router(short_urls_router)
 
     yield
 
     # Shutdown the connection to MongoDB
+    fastapi_logger.info("Disconnecting from MongoDB")
     client.close()
 
 
@@ -53,6 +67,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests_middleware(request: Request, call_next):
+    start_time = time.time()
+
+    response = await call_next(request)
+
+    process_time = time.time() - start_time
+    fastapi_logger.info(
+        f"{request.client.host} - {request.method} {request.url.path} - {response.status_code} ({process_time:.2f}s)"
+    )
+
+    return response
 
 
 @app.get("/", response_class=HTMLResponse)

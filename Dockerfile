@@ -30,4 +30,4 @@ ENV GRANIAN_LOG_LEVEL=debug
 ENV GRANIAN_LOOP=uvloop
 
 
-ENTRYPOINT ["uv", "run", "granian", "--interface", "asgi", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uv", "run", "granian", "--interface", "asgi", "main:app", "--host", "0.0.0.0", "--port", "8000", "--log-config", "logging_conf.json"]
