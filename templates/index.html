@@ -1,0 +1,100 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>URL Shortener</title>
+        <!-- HTMX -->
+        <script defer src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+        <!-- Alpine.js -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <!-- daisyUI -->
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+        <!-- TailwindCSS -->
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="w-1/2 mx-auto p-8 text-center flex flex-col justify-start items-center pt-[24vh]">
+            <p class="text-5xl" id="title">Shorten your URLs</p>
+        </div>
+        
+        <div class="flex justify-center items-center mt-[6vh]" id="greeting">
+            <div class="flex flex-col items-start">
+                <p class="text-xl">
+                    Put in a URL that you want to shorten and a short URL will be generated<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp; for you that you can use to be redirected to your full URL.
+                </p>
+            </div>
+        </div>
+        <div id="input-and-submit" x-data="{ url: '' }">
+            <!-- Input box -->
+            <div class="flex justify-center items-center mt-[6vh]">
+                <div class="flex flex-col">
+                    <label class="input input-xl input-primary border-2">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </g>
+                        </svg>
+                        <input
+                                type="url"
+                                required
+                                placeholder="https://"
+                                pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
+                                title="Must be a valid URL"
+                                x-model="url"
+                                name="url"
+                        />
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Button -->
+            <div class="flex justify-center items-center mt-[1vh]">
+                <div class="flex flex-col">
+                    <button
+                            class="btn btn-lg btn-primary"
+                            :disabled="!isValidUrl(url)"
+                            hx-post="/new-url"
+                            hx-include="input[name='url']"
+                            hx-target="#result"
+                    >
+                        Get short URL
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="result" class="mt-4 text-green-500"></div>
+    </body>
+</html>
+
+<script lang="js">
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+</script>
+
+<style>
+    #title {
+        font-family: "Boldonse", system-ui;
+        font-weight: 400;
+        font-style: normal;
+    }
+    #greeting {
+        font-family: "Exo 2", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: <weight>;
+        font-style: normal;
+    }
+</style>
