@@ -7,6 +7,7 @@
         <title>URL Shortener</title>
         <!-- HTMX -->
         <script defer src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
         <!-- Alpine.js -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <!-- daisyUI -->
@@ -31,11 +32,11 @@
                 </p>
             </div>
         </div>
-        <div id="input-and-submit" x-data="{ url: '' }">
+        <div id="input-and-submit" x-data="{ long_url: '' }">
             <!-- Input box -->
             <div class="flex justify-center items-center mt-[6vh]">
                 <div class="flex flex-col">
-                    <label class="input input-xl input-primary border-2">
+                    <label class="input input-xl input-primary border-2 w-full">
                         <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
                                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -48,8 +49,10 @@
                                 placeholder="https://"
                                 pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
                                 title="Must be a valid URL"
-                                x-model="url"
-                                name="url"
+                                x-model="long_url"
+                                name="long_url"
+                                hx-headers="{'Content-Type': 'application/json'}"
+                                hx-ext="json-enc"
                         />
                     </label>
                 </div>
@@ -60,10 +63,12 @@
                 <div class="flex flex-col">
                     <button
                             class="btn btn-lg btn-primary"
-                            :disabled="!isValidUrl(url)"
+                            :disabled="!isValidUrl(long_url)"
                             hx-post="/new-url"
-                            hx-include="input[name='url']"
+                            hx-headers="{'Content-Type': 'application/json'}"
+                            hx-include="input[name='long_url']"
                             hx-target="#result"
+                            hx-ext="json-enc"
                     >
                         Get short URL
                     </button>

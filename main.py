@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from models import ShortURLs
+from models import ShortURL
 from routes.url_router import short_urls_router
 
 
@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     fastapi_logger.info("Connecting to MongoDB")
 
     client = motor.motor_asyncio.AsyncIOMotorClient(os.getenv("MONGO_URI"))
-    await init_beanie(database=client.aguest_me, document_models=[ShortURLs])
+    await init_beanie(database=client.aguest_me, document_models=[ShortURL])
 
     fastapi_logger.info("Connected to MongoDB")
 
