@@ -1,61 +1,23 @@
-import random
-import string
-
 from beanie.operators import And
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from models import CreateShortURLRequest, ShortURL
+from utils.helpers import get_or_generate_short_url
 
 
 short_urls_router = APIRouter()
 
 
-@short_urls_router.post("/new-url", response_class=JSONResponse)
+@short_urls_router.post("/new-url", response_class=HTMLResponse)
 async def create_new_url(short_url_request: CreateShortURLRequest):
-    if not short_url_request.long_url.startswith(
-        "http://"
-    ) and not short_url_request.long_url.startswith("https://"):
-        short_url_request.long_url = "https://" + short_url_request.long_url
+    short_url = await get_or_generate_short_url(short_url_request.long_url)
 
-    # Verify that the given URL is not already in the DB
-    mongo_query = And(
-        ShortURL.full_url == short_url_request.long_url, ShortURL.is_expired == False
-    )
-    existing_doc = await ShortURL.find(mongo_query).first_or_none()
+    html_div = """
+        <p class="text-xl mt-8">{short}</p>
+    """.format(short=short_url)
 
-    if existing_doc is not None:
-        return {
-            "message": f"{short_url_request.long_url} already exists",
-            "short": existing_doc.short_url,
-        }
-    else:
-        characters = string.ascii_uppercase + string.ascii_lowercase
-        # Generate a random string of 5 characters that are a mix of upper and lowercase letters
-        random_string = "".join(random.choice(characters) for _ in range(5))
-
-        # Check if the random string is in the DB already
-        mongo_query = And(
-            ShortURL.short_url == random_string, ShortURL.is_expired == False
-        )
-        existing_doc = await ShortURL.find(mongo_query).first_or_none()
-
-        # If `random_string` is already in the DB, then regenerate a random string
-        while existing_doc is not None:
-            random_string = "".join(random.choice(characters) for _ in range(5))
-            mongo_query = And(
-                ShortURL.short_url == random_string, ShortURL.is_expired == False
-            )
-            existing_doc = await ShortURL.find(mongo_query).first_or_none()
-
-        new_doc = ShortURL(short_url=random_string, full_url=short_url_request.long_url)
-        await new_doc.insert()
-
-        return {
-            "message": f"{short_url_request.long_url} created",
-            "short": new_doc.short_url,
-            "long": new_doc.full_url,
-        }
+    return HTMLResponse(content=html_div)
 
 
 @short_urls_router.get("/{short_url}", response_class=RedirectResponse)

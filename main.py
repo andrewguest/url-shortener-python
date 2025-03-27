@@ -14,6 +14,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from models import ShortURL
+from routes.api_router import api_router
 from routes.url_router import short_urls_router
 
 
@@ -42,6 +43,7 @@ async def lifespan(app: FastAPI):
     fastapi_logger.info("Connected to MongoDB")
 
     # Register other routers
+    app.include_router(api_router)
     app.include_router(short_urls_router)
 
     yield
