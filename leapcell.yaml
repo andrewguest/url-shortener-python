@@ -1,5 +1,5 @@
 runtime: python
 buildCommand: sh build_commands.sh
-startCommand: granian --interface asgi main:app --host "0.0.0.0" --port 8000 --log-config logging_conf.json
+startCommand: uv run granian --interface asgi main:app --host "0.0.0.0" --port 8000 --log-config logging_conf.json
 port: 8000
 memory: 512mb
