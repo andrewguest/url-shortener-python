@@ -1,0 +1,5 @@
+runtime: python
+startCommand: granian --interface asgi main:app --host "0.0.0.0" --port 8000 --log-config logging_conf.json
+buildCommand: pip install -r requirements.txt
+port: 8000
+memory: 512mb
