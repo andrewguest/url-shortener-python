@@ -59,9 +59,6 @@ app = FastAPI(
     description="Python application to create short URLs that redirect to long URLs.",
     version="0.0.1",
     lifespan=lifespan,
-    # Host this application at https://<url>/py-short-urls. All of these routes will actually have "/py-short-urls"
-    #   pre-pended to them.
-    root_path="/py-short-urls",
 )
 
 # Middleware
@@ -69,7 +66,7 @@ app.add_middleware(
     CORSMiddleware,  # noqa
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 

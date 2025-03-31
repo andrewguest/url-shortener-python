@@ -47,7 +47,7 @@ async def get_or_generate_short_url(long_url: str) -> str:
             existing_doc = await ShortURL.find(mongo_query).first_or_none()
 
         new_doc = ShortURL(
-            short_url=f"https://projects.aguest.me/py-short-urls/{random_string}",
+            short_url=f"{random_string}",
             full_url=long_url,
         )
         await new_doc.insert()
