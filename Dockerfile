@@ -8,10 +8,10 @@ LABEL authors="Andrew"
 COPY . /app
 WORKDIR /app
 
-RUN apt update && apt upgrade -y
-
-# Install the project's dependencies
-RUN uv python install && \
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y curl wget && \
+    uv python install && \
     uv venv && \
     uv sync --frozen
 
