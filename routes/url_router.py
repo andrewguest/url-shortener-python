@@ -28,7 +28,6 @@ async def redirect_to_full_url(short_url: str):
     # Verify that the given URL is in the DB
     mongo_query = And(ShortURL.short_url == short_url, ShortURL.is_expired == False)
     existing_doc = await ShortURL.find(mongo_query).first_or_none()
-    print(f"Short URL: {short_url}")
 
     if existing_doc is not None:
         # Increment the `visits` counter before redirecting
